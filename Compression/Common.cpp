@@ -959,7 +959,7 @@ void Install_signal_handler (void (__cdecl *signal_handler)(int))
 // Windows 7 taskbar progress indicator ***************************************
 //*****************************************************************************
 
-#ifdef FREEARC_WIN
+#if defined(FREEARC_WIN) && (FREEARC_GUI)
 
 // Include Win7-specific defines unless on GCC3
 #if !defined(__GNUC__) || __GNUC__>=4

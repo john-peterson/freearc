@@ -1,5 +1,11 @@
-include ../common.mak
+ifeq ($(MAKECMDGOALS), mingw32)
+    COMMON=mingw32
+else
+    COMMON=common
+endif
+include ../$(COMMON).mak
 
+mingw32: mkdir unarc.exe unarc.dll
 windows: mkdir unarc.exe unarc.dll FreeArc.fmt arc.sfx arc-mini.sfx arc-tiny.sfx freearc.sfx freearc-mini.sfx freearc-tiny.sfx freearc-installer.sfx freearc-installer-nodelete.sfx
 unix: mkdir unarc arc.linux.sfx arc-mini.linux.sfx arc-tiny.linux.sfx
 
@@ -25,11 +31,10 @@ CONSOLE_LINK_FLAGS = $(LINK_FLAGS) -lole32
 GUI_LINK_FLAGS     = $(LINK_FLAGS) -lole32 -lcomctl32 -mwindows
 
 
-CODE_FLAGS  = -fno-exceptions -fno-rtti -Wall \
-              -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion
+CODE_FLAGS  = -fno-exceptions -fno-rtti -Wall              -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion -Wfatal-errors -w
 OPT_FLAGS   = -march=i486 -mtune=pentiumpro -ffast-math \
               -fomit-frame-pointer -fstrict-aliasing \
-              -fforce-addr
+              -fforce-addr -std=c++11
 DEBUG_FLAGS = -g0
 CFLAGS = $(CODE_FLAGS) $(OPT_FLAGS) -O2 $(DEBUG_FLAGS) $(DEFINES) $(Extractor_DEFINES)
 CFLAGS1= $(CODE_FLAGS) $(OPT_FLAGS) -O1 $(DEBUG_FLAGS) $(DEFINES) $(Extractor_DEFINES)
@@ -39,7 +44,7 @@ UPX = cmd /c rem
 #UPX = upx.exe -9 --lzma --compress-icons=2
 
 mkdir:
-	-mkdir $(OBJDIR)
+	-mkdir -p $(OBJDIR)
 
 
 
