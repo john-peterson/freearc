@@ -1,7 +1,7 @@
 ifeq ($(MAKECMDGOALS), mingw32)
     COMMON=mingw32
 else
-    COMMON=common
+    COMMON=unix-common
 endif
 include ../$(COMMON).mak
 
@@ -16,7 +16,7 @@ LINKOBJ_FAR_PLUGIN = $(OBJDIR)/Environment.o $(OBJDIR)/Common.o $(OBJDIR)/Compre
 LINKOBJ_TINY = $(LINKOBJ_FAR_PLUGIN) $(OBJDIR)/C_BCJ.o $(OBJDIR)/C_Dict.o $(OBJDIR)/C_Delta.o
 LINKOBJ_MINI = $(LINKOBJ_TINY) $(OBJDIR)/C_REP.o $(OBJDIR)/C_LZP.o $(OBJDIR)/C_PPMD.o $(OBJDIR)/C_External.o
 LINKOBJ      = $(LINKOBJ_MINI) $(OBJDIR)/C_MM.o $(OBJDIR)/C_TTA.o $(OBJDIR)/C_Tornado.o $(OBJDIR)/C_GRZip.o $(OBJDIR)/C_4x4.o \
-                               $(OBJDIR)/C_DisPack.o $(OBJDIR)/C_LZ4.o $(OBJDIR)/C_Encryption.o $(OBJDIR)/C_CLS.o
+                               $(OBJDIR)/C_DisPack.o $(OBJDIR)/C_LZ4.o $(OBJDIR)/C_Encryption.o #$(OBJDIR)/C_CLS.o
 
 FAR_PLUGIN = FarPlugin.cpp ArcStructure.h
 UNARC = ArcStructure.h ArcCommand.h ArcProcess.h
@@ -25,18 +25,18 @@ GUI = gui\gui.h gui\gui.cpp
 HEADERS =  ../Compression/Compression.h ../Compression/Common.h
 
 LINK_FLAGS = -L$(LIBDIR) -Xlinker --large-address-aware -lstdc++ -s
-UNIX_LINK_FLAGS = -L$(LIBDIR) -lstdc++ -lrt -lpthread -s
+UNIX_LINK_FLAGS = -L$(LIBDIR) -lstdc++ -lrt -$lpthread
 
 CONSOLE_LINK_FLAGS = $(LINK_FLAGS) -lole32
 GUI_LINK_FLAGS     = $(LINK_FLAGS) -lole32 -lcomctl32 -mwindows
 
 
 CODE_FLAGS  = -fno-exceptions -fno-rtti -Wall              -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion -Wfatal-errors -w
-OPT_FLAGS   = -march=i486 -mtune=pentiumpro -ffast-math \
+OPT_FLAGS   = -ffast-math \
               -fomit-frame-pointer -fstrict-aliasing \
               -fforce-addr -std=c++11
-DEBUG_FLAGS = -g0
-CFLAGS = $(CODE_FLAGS) $(OPT_FLAGS) -O2 $(DEBUG_FLAGS) $(DEFINES) $(Extractor_DEFINES)
+DEBUG_FLAGS = -g
+CFLAGS = $(CODE_FLAGS) $(OPT_FLAGS) -O0 $(DEBUG_FLAGS) $(DEFINES) $(Extractor_DEFINES)
 CFLAGS1= $(CODE_FLAGS) $(OPT_FLAGS) -O1 $(DEBUG_FLAGS) $(DEFINES) $(Extractor_DEFINES)
 
 #No more use UPX due to problems with antivirus software
