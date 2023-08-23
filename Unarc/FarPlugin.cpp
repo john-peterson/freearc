@@ -114,7 +114,7 @@ int WINAPI _export GetArcItem(struct PluginPanelItem *Item,struct ArcItemInfo *I
          FreeAndNil (dirblock);
       }
     }
-    //printf("%d files\n", dirblock->total_files);
+    printf("%d files\n", dirblock->total_files);
   }
 
   // Заполним описание файла

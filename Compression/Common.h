@@ -10,7 +10,7 @@
 #include <math.h>
 #include <time.h>
 #include <setjmp.h>
-
+#include <signal.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -561,7 +561,7 @@ extern jmp_buf jumper;
 #  elif defined(FREEARC_WIN)
 #    define CHECK(e,a,b)           {if (!(a))  {if (jmpready) longjmp(jumper,1);  char *s=(char*)malloc_msg(MY_FILENAME_MAX*4),  *oem=(char*)malloc_msg(MY_FILENAME_MAX*4);  sprintf b;  utf8_to_oem(s,oem);  printf("\n%s",oem);  ON_CHECK_FAIL();  exit(FREEARC_EXIT_ERROR);}}
 #  else
-#    define CHECK(e,a,b)           {if (!(a))  {if (jmpready) longjmp(jumper,1);  char s[MY_FILENAME_MAX*4];  sprintf b;  printf("\n%s",s);  ON_CHECK_FAIL();  exit(FREEARC_EXIT_ERROR);}}
+#    define CHECK(e,a,b)           {if (!(a))  {if (jmpready) longjmp(jumper,1);  char s[MY_FILENAME_MAX*4];  sprintf b;  printf("%s\n",s);  raise(SIGINT); exit(FREEARC_EXIT_ERROR);}}
 #  endif
 #endif
 

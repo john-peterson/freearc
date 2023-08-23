@@ -24,7 +24,7 @@ CUI = CUI.h
 GUI = gui\gui.h gui\gui.cpp
 HEADERS =  ../Compression/Compression.h ../Compression/Common.h
 
-LINK_FLAGS = -L$(LIBDIR) -Xlinker --large-address-aware -lstdc++ -s
+LINK_FLAGS = -L$(LIBDIR) -Xlinker --large-address-aware -lstdc++
 UNIX_LINK_FLAGS = -L$(LIBDIR) -lstdc++ -lrt -$lpthread
 
 CONSOLE_LINK_FLAGS = $(LINK_FLAGS) -lole32
@@ -54,7 +54,7 @@ unarc.exe: $(OBJDIR)/unarc.o $(LINKOBJ)
 
 unarc.dll: unarcdll.cpp unarcdll.h $(UNARC) $(HEADERS) $(LINKOBJ)
 	$(GCC) -c $(CFLAGS) -DFREEARC_LIBRARY -DUNARC_DECRYPTION -o $(OBJDIR)/unarcdll.o $<
-	$(DLLWRAP) --driver-name $(GCC_EXE) $(OBJDIR)/unarcdll.o $(LINKOBJ) -lstdc++ -lole32 -def unarc.def -s -o $@
+	$(DLLWRAP) --driver-name $(GCC_EXE) $(OBJDIR)/unarcdll.o $(LINKOBJ) -lstdc++ -lole32 -def unarc.def -o $@
 
 FreeArc.fmt: $(OBJDIR)/FarPlugin.o FarPlugin.def $(LINKOBJ_FAR_PLUGIN)
 	$(DLLWRAP) --driver-name $(GCC_EXE) $< $(LINKOBJ_FAR_PLUGIN) -lstdc++ -lole32 -def FarPlugin.def -s -o $@

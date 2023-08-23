@@ -266,7 +266,7 @@ char *PROCESS::GenerateDecryption (char *compressor, char *new_compressor)
 #else
   if (!compressorIsEncrypted(compressor))                                     // Быстро выйдем если в алгоритм не входят методы шифрования
     return compressor;
-
+  printf("archive encrypted\n");
   char new_method_buf[MAX_COMPRESSOR_STRLEN], *new_method = new_method_buf;   // Буфер для записи вновь сконструированных методов шифрования (с ключом)
 
   // Разобьём компрессор на отдельные алгоритмы
@@ -290,6 +290,10 @@ char *PROCESS::GenerateDecryption (char *compressor, char *new_compressor)
       BYTE  salt[MAXKEYSIZE];  decode16 (saltStr, salt);
 
       char *checkCodeStr  = search_param(param+1, "c");                       // Код, используемый доля проверки правильности пароля
+      if(checkCodeStr==0){
+        printf("can't find validation key\n");
+        return compressor;
+      }
       int   checkCodeSize = strlen(checkCodeStr) / 2;
       BYTE  checkCode[MAXKEYSIZE];  decode16 (checkCodeStr, checkCode);
 

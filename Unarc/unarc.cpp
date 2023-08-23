@@ -95,7 +95,7 @@ class INSTALLER_GUI : public GUI
 
 int main (int argc, char *argv[])
 {
-  UI.DisplayHeader (HEADER1 NAME);
+  //UI.DisplayHeader (HEADER1 NAME);
   COMMAND command (argc, argv);    // Распарсить команду
   if (command.ok)                  // Если парсинг был удачен и можно выполнить команду
     PROCESS (&command, &UI);       //   Выполнить разобранную команду

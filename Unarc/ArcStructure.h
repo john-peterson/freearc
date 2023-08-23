@@ -1,3 +1,4 @@
+
 // Обработка архивов, созданных FreeArc:
 //   чтение и декодирование Footer блока и блоков оглавления
 #include <stdlib.h>
@@ -96,9 +97,11 @@ public:
       char *origbuf = (char*) malloc (origsize+8);  // Лишние 8 байт для запаса при выполнении readInteger
       int result = DecompressMem (compressor, buf, compsize, origbuf, origsize);
       CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: unsupported compression method \"%s\"", compressor));
+      printf("size: %#x==%#x\n",result,origsize);
       CHECK (FREEARC_ERRCODE_BAD_HEADERS,  result==origsize,  (s,"ERROR: archive structure corrupted (decompression of control block failed)"));
       free(buf), p=buf=origbuf, bufend=buf+origsize;
       CRC crc = CalcCRC (buf, origsize);
+      printf("crc: %#x==%#x\n",right_crc,crc);
       CHECK (FREEARC_ERRCODE_BAD_HEADERS,  crc==right_crc,  (s,"ERROR: archive structure corrupted (control block failed CRC check)"))
       return *this;
     }
@@ -221,7 +224,7 @@ struct LOCAL_BLOCK_DESCRIPTOR : BLOCK
     buffer.read4 (&crc );
     CHECK (FREEARC_ERRCODE_BAD_HEADERS,  sign==aSIGNATURE && origsize>0 && compsize>0 && compsize<=descr_pos,  (s,"ERROR: archive structure corrupted (strange descriptor)"));
     pos = descr_pos-compsize;
-    //printf("%4.4s %d %s %u %u %08x\n", &sign, type, compressor, origsize, compsize, crc);
+    printf("block: %4.4s %d %s %u %u %08x\n", &sign, type, compressor, origsize, compsize, crc);
   }
 };
 
@@ -238,6 +241,8 @@ struct FOOTER_BLOCK_LOCAL_DESCRIPTOR : LOCAL_BLOCK_DESCRIPTOR
 // Найти в архивном файле дескриптор FOOTER BLOCK и возвратить его позицию
 FILESIZE FindFooterDescriptor (MYFILE &arcfile)
 {
+  printf("footer: \"ArC\" in the last %#x bytes\n", MAX_FOOTER_DESCRIPTOR_SIZE);
+
   char buf[MAX_FOOTER_DESCRIPTOR_SIZE];
   FILESIZE arcsize = arcfile.size();
   FILESIZE size = mymin (arcsize, MAX_FOOTER_DESCRIPTOR_SIZE);  // мы будем искать сигнатуру в последних size байтах архива
@@ -283,7 +288,7 @@ void ARCHIVE::read_structure (GenerateDecryptionCallback* GenerateDecryption, vo
   buffer.read (&control_blocks_descriptors);                // Декодировать из буфера дескрипторы служебных блоков архива
   iterate_array (i, control_blocks_descriptors) {
     control_blocks_descriptors[i].pos  =  arcFooter.pos - control_blocks_descriptors[i].pos; // Заменим относительные адреса блоков (хранящиеся как смещение относительно начала ЭТОГО блока) на абсолютные
-    //printf("%d %d\n", control_blocks_descriptors[i].pos, control_blocks_descriptors[i].compsize);
+    printf("descriptor: %#.10x +%#.3x\n", control_blocks_descriptors[i].pos, control_blocks_descriptors[i].compsize);
   }
   SFXSize = control_blocks_descriptors[0].pos;   // всё, что находится перед первым блоком архива, можно смело считать SFX-модулем :)
   buffer.read1 (&arcLocked);                     // 1 байт: 1 - архив заблокирован от дальнейших изменений, 0 - нет
@@ -296,7 +301,7 @@ void ARCHIVE::read_structure (GenerateDecryptionCallback* GenerateDecryption, vo
     buffer.read (&cmtlen);                       // Комментарий кодируется как массив символов с явно заданной длиной
     if (cmtlen>0)  arcComment.set (cmtlen, buffer.p);
   }
-  //printf("%d %d %*.*s\n", arcLocked, arcComment.size, arcComment.size, arcComment.size, &arcComment[0]);
+  printf("comment: %d %d %*.*s\n", arcLocked, arcComment.size, arcComment.size, arcComment.size, &arcComment[0]);
 }
 
 
@@ -361,7 +366,7 @@ DIRECTORY_BLOCK::DIRECTORY_BLOCK (ARCHIVE &arc, BLOCK &block_info, GenerateDecry
     data_block[i].origsize   = 0;               // А оно кому надо?
     data_block[i].compsize   = compsizes[i];
     data_block[i].crc        = 0;               // CRC блоков данных не хранится - это ни к чему
-    //printf("datablock %s %d %d\n", data_block[i].compressor, data_block[i].pos, data_block[i].compsize);
+    printf("data: %#.10x +%#.5x %s\n", data_block[i].pos, data_block[i].compsize, data_block[i].compressor);
   }
 
   // Посчитаем общее кол-во файлов в этом каталоге и изменим num_of_files[block_num] так, чтобы этот массив можно было использовать для определения файлов, принадлежащих блоку данных block_num
@@ -379,7 +384,7 @@ DIRECTORY_BLOCK::DIRECTORY_BLOCK (ARCHIVE &arc, BLOCK &block_info, GenerateDecry
   buffer.read4 (total_files, &crc);
 
   //iterate( total_files, printf("%s %s %d %d\n", dirname(i), name[i], size[i], isdir[i]));
-  //printf("%d files\n", total_files);
+  printf("%d files\n", total_files);
 }
 
 // Полное имя i-го файла
