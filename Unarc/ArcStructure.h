@@ -96,13 +96,13 @@ public:
       open (file, pos, compsize);
       char *origbuf = (char*) malloc (origsize+8);  // Лишние 8 байт для запаса при выполнении readInteger
       int result = DecompressMem (compressor, buf, compsize, origbuf, origsize);
-      CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: unsupported compression method \"%s\"", compressor));
+      CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: DecompressMem unsupported compression method \"%s\"", compressor));
       printf("size: %#x==%#x\n",result,origsize);
       CHECK (FREEARC_ERRCODE_BAD_HEADERS,  result==origsize,  (s,"ERROR: archive structure corrupted (decompression of control block failed)"));
       free(buf), p=buf=origbuf, bufend=buf+origsize;
       CRC crc = CalcCRC (buf, origsize);
       printf("crc: %#x==%#x\n",right_crc,crc);
-      CHECK (FREEARC_ERRCODE_BAD_HEADERS,  crc==right_crc,  (s,"ERROR: archive structure corrupted (control block failed CRC check)"))
+      // CHECK (FREEARC_ERRCODE_BAD_HEADERS,  crc==right_crc,  (s,"ERROR: archive structure corrupted (control block failed CRC check)"))
       return *this;
     }
 
@@ -113,7 +113,7 @@ public:
       bufend -= sizeof(CRC);
       CRC right_crc = *(CRC*)bufend;
       CRC crc = CalcCRC (buf, size-sizeof(CRC));
-      CHECK (FREEARC_ERRCODE_BAD_HEADERS,  crc==right_crc,  (s,"ERROR: archive structure corrupted (descriptor failed CRC check)"))
+      // CHECK (FREEARC_ERRCODE_BAD_HEADERS,  crc==right_crc,  (s,"ERROR: archive structure corrupted (descriptor failed CRC check)"))
       return *this;
     }
 

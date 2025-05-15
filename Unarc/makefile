@@ -10,7 +10,7 @@ windows: mkdir unarc.exe unarc.dll FreeArc.fmt arc.sfx arc-mini.sfx arc-tiny.sfx
 unix: mkdir unarc arc.linux.sfx arc-mini.linux.sfx arc-tiny.linux.sfx
 
 Extractor_DEFINES = -DFREEARC_DECOMPRESS_ONLY -D_NO_EXCEPTIONS -DUNARC
-OBJDIR  = $(TEMPDIR)-unarc
+OBJDIR  = $(TEMPDIR)
 LINKOBJ_FAR_PLUGIN = $(OBJDIR)/Environment.o $(OBJDIR)/Common.o $(OBJDIR)/CompressionLibrary.o \
                      $(OBJDIR)/C_LZMA.o
 LINKOBJ_TINY = $(LINKOBJ_FAR_PLUGIN) $(OBJDIR)/C_BCJ.o $(OBJDIR)/C_Dict.o $(OBJDIR)/C_Delta.o
