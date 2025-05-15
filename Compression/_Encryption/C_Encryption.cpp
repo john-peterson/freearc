@@ -136,11 +136,13 @@ struct EncryptionMode
                 {
                     initialized = true;
                     AesGenTables();
+#ifdef MY_CPU_X86_OR_AMD64
                     if (CPU_Is_Aes_Supported())
                     {
                         FARPROC Fast_AesCtr_Code = LoadFromDLL("Fast_AesCtr_Code");
                         if (Fast_AesCtr_Code)  g_AesCtr_Code = (AES_CODE_FUNC) Fast_AesCtr_Code;
                     }
+#endif
                 }
             }
 

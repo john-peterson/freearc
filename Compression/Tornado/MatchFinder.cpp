@@ -7,7 +7,7 @@
 // If you need a commercial license to use the code, please write to Bulat.Ziganshin@gmail.com
 
 typedef uint   HashVal;      // Result of hashing function
-typedef uint32 PtrVal;       // Pointers to buf stored in HTable
+typedef uintptr_t PtrVal;       // Pointers to buf stored in HTable
 typedef uint32 HintVal;      // Cached bytes from buf stored in HTable
 
 // Maximum number of bytes used for hashing in any match finder.

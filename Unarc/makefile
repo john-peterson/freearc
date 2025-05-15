@@ -31,7 +31,7 @@ CONSOLE_LINK_FLAGS = $(LINK_FLAGS) -lole32
 GUI_LINK_FLAGS     = $(LINK_FLAGS) -lole32 -lcomctl32 -mwindows
 
 
-CODE_FLAGS  = -fno-exceptions -fno-rtti -Wall              -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion -Wfatal-errors -w
+CODE_FLAGS  = -fno-exceptions -fno-rtti               -Wno-unknown-pragmas -Wno-sign-compare -Wno-conversion -Wfatal-errors -w -Wno-error -Wno-c++11-narrowing
 OPT_FLAGS   = -ffast-math \
               -fomit-frame-pointer -fstrict-aliasing \
               -fforce-addr -std=c++11
