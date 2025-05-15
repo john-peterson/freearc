@@ -373,7 +373,7 @@ void PROCESS::ExtractFiles (DIRECTORY_BLOCK *dirblock, int block_num)
     char compressor2_buf[MAX_COMPRESSOR_STRLEN];
     char *compressor2 = GenerateDecryption(compressor1? compressor1 : data_block.compressor, compressor2_buf);
     int result = Decompress (compressor2, global_callback, this);
-    CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: unsupported compression method %s", data_block.compressor));
+    CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: Decompress unsupported compression method %s", data_block.compressor));
     CHECK (result,  result>=0 || result==FREEARC_ERRCODE_NO_MORE_DATA_REQUIRED,  (s,"ERROR: archive data corrupted (decompression fails)"));
     if (compressor1!=data_block.compressor)  free (compressor1);
     if (!outfile_close())  return;               // Закроем последний выходной файл
