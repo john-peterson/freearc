@@ -381,6 +381,7 @@ static int multi_de_compress (COMPRESSION direction, char *compressor, CALLBACK_
   for (int i=N-1; i>=0; i--)
   {
     int nStreams  =  CompressionService (cm[i], "NumOutStreams");
+    printf("multi_de_compress: %s\n", cm[i]);
     if (nStreams <= 0)  return FREEARC_ERRCODE_INVALID_COMPRESSOR;
 
     if (direction==COMPRESS)  // ÑÎÇÄÀÄÈÌ ÄÅÐÅÂÎ ÂÛÕÎÄÎÂ ÄËß ÓÏÀÊÎÂÊÈ ============================================================

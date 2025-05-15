@@ -249,7 +249,8 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
     int ExitCode = 0;                                     // код возврата внешней программы
 
     // Перепишем входные данные во временный файл
-    infile.remove();
+    printf("removing infile=%s\n", infile.displayname());
+    // infile.remove();
     uint64 bytes = 0;
     BYTE runCmd = 1;
     if (direction==DECOMPRESS && useHeader)  checked_read (&runCmd, 1);
@@ -277,6 +278,7 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
 
     // Если cmd пусто - диск используется просто для буферизации данных перед дальнейшим сжатием.
     // Если runCmd==0 - данные были скопированы без сжатия
+    printf("removing and extracting data from outfile=%s\n", outfile.displayname());
     outfile.remove();
     if (*cmd && runCmd) {
         MYFILE _tcmd(cmd); // utf8->utf16 conversion
@@ -291,6 +293,7 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
         if (w.errcode < 0)                  {x=w.errcode; goto finished;}
         if (w.read_stdout)                  {x=ExitCode?FREEARC_ERRCODE_GENERAL:0; goto finished;}
     } else {
+        printf("last command renaming %s --> %s\n", infile.displayname(), outfile.displayname());
         infile.rename (outfile);
     }
 
