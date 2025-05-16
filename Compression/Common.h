@@ -852,7 +852,8 @@ struct MYFILE
   void mark_as_temporary()           {registerTemporaryFile(*this); is_temp = TRUE;}
 
   int handle;
-  TCHAR *filename;
+  /* TCHAR *filename; */
+  WCHAR *filename;
   char *utf8name, *utf8lastname, *oemname;
 
   void SetBaseDir (char *utf8dir)    // Set base dir
@@ -867,13 +868,15 @@ struct MYFILE
 #ifdef FREEARC_WIN
 #  ifdef FREEARC_GUI                 // Win32 GUI *****************************************
   void setname (FILENAME _filename)  {strcpy (utf8lastname, _filename);
-                                      utf8_to_utf16 (utf8name, filename);}
+                                      /* utf8_to_utf16 (utf8name, filename); */
+  }
   CFILENAME displayname (void)       {return filename;}
 
 #  else                              // Win32 console *************************************
   void setname (FILENAME _filename)  {strcpy (utf8lastname, _filename);
-                                      utf8_to_utf16 (utf8name, filename);
-                                      CharToOemW (filename, oemname);}
+                                      /* utf8_to_utf16 (utf8name, filename); */
+                                      /* CharToOemW (filename, oemname); */
+  }
   FILENAME displayname (void)        {return oemname;}
 #  endif
 
@@ -886,7 +889,8 @@ struct MYFILE
   void init()                             {handle   = -1;
                                            is_temp  = FALSE;
 #ifdef FREEARC_WIN
-                                           filename = (TCHAR*) malloc_msg (MY_FILENAME_MAX*4);
+                                           /* filename = (TCHAR*) malloc_msg (MY_FILENAME_MAX*4); */
+                                           filename = (WCHAR*) malloc_msg (MY_FILENAME_MAX*4);
 #endif
                                            oemname  = (char*)  malloc_msg (MY_FILENAME_MAX);
                                            utf8name = (char*)  malloc_msg (MY_FILENAME_MAX*4);
