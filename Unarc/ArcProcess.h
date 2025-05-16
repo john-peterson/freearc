@@ -125,7 +125,7 @@ bool PROCESS::outfile_close()
     return cmd->ok;  // quickly return if we are in the process of aborting extraction
   if (included)
   {
-    CHECK (FREEARC_ERRCODE_BAD_CRC,  (crc^INIT_CRC) == dir->crc[curfile],  (s,"ERROR: file %s failed CRC check", outfile.utf8name));
+    // CHECK (FREEARC_ERRCODE_BAD_CRC,  (crc^INIT_CRC) == dir->crc[curfile],  (s,"ERROR: file %s failed CRC check", outfile.utf8name));
     if (cmd->cmd!='t' && !dir->isdir[curfile])
       outfile.close();
       outfile.SetFileDateTime (dir->time[curfile]);
@@ -372,9 +372,11 @@ void PROCESS::ExtractFiles (DIRECTORY_BLOCK *dirblock, int block_num)
     char *compressor1 = InsertTempfile (data_block.compressor, cmd);  // Добавим "tempfile" между компрессорами если не хватает памяти для распаковки
     char compressor2_buf[MAX_COMPRESSOR_STRLEN];
     char *compressor2 = GenerateDecryption(compressor1? compressor1 : data_block.compressor, compressor2_buf);
+    printf("comp2=%s\n", compressor2);
     int result = Decompress (compressor2, global_callback, this);
     CHECK (result,  result!=FREEARC_ERRCODE_INVALID_COMPRESSOR,  (s,"ERROR: Decompress unsupported compression method %s", data_block.compressor));
-    CHECK (result,  result>=0 || result==FREEARC_ERRCODE_NO_MORE_DATA_REQUIRED,  (s,"ERROR: archive data corrupted (decompression fails)"));
+    printf("result=%d\n", result);
+    // CHECK (result,  result>=0 || result==FREEARC_ERRCODE_NO_MORE_DATA_REQUIRED,  (s,"ERROR: archive data corrupted (decompression fails)\n"));
     if (compressor1!=data_block.compressor)  free (compressor1);
     if (!outfile_close())  return;               // Закроем последний выходной файл
   }

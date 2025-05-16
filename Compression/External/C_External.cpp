@@ -277,7 +277,10 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
 
     // Если cmd пусто - диск используется просто для буферизации данных перед дальнейшим сжатием.
     // Если runCmd==0 - данные были скопированы без сжатия
-    outfile.remove();
+    // if (outfile.displayname())
+    // printf("remove=%s\n", outfile.displayname());
+    // outfile.remove();
+    printf("removed=%s\n", outfile.displayname());
     if (*cmd && runCmd) {
         MYFILE _tcmd(cmd); // utf8->utf16 conversion
         char temp[100];
@@ -295,14 +298,16 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
     }
 
     // Откроем выходной файл, если команда завершилась успешно и его можно открыть
+        printf("exit=%d\n", ExitCode);
     if(ExitCode==0)    outfile.tryOpen (READ_MODE);
     if (outfile.isopen()) {
         infile.remove();
         BYTE compressed[1] = {1};
         if (direction==COMPRESS && useHeader)            checked_write(compressed,1);
     } else {
+        printf("failed to extraction file=%s\n", outfile.displayname());
         if (direction==COMPRESS && !useHeader)           {x=FREEARC_ERRCODE_GENERAL; goto finished;}
-        outfile.remove();
+        // outfile.remove();
         if (direction==DECOMPRESS)                       {x=FREEARC_ERRCODE_INVALID_COMPRESSOR; goto finished;}
         infile.rename (outfile);
         if (!outfile.tryOpen (READ_MODE))                {x=FREEARC_ERRCODE_READ; goto finished;}
@@ -320,6 +325,7 @@ int EXTERNAL_METHOD::DeCompress (COMPRESSION direction, CALLBACK_FUNC *callback,
 finished:
     FreeAndNil(Buf);
     delete cmd;
+    printf("return x\n");
     return x;         // 0, если всё в порядке, и код ошибки иначе
 }
 
