@@ -366,7 +366,7 @@ DIRECTORY_BLOCK::DIRECTORY_BLOCK (ARCHIVE &arc, BLOCK &block_info, GenerateDecry
     data_block[i].origsize   = 0;               // А оно кому надо?
     data_block[i].compsize   = compsizes[i];
     data_block[i].crc        = 0;               // CRC блоков данных не хранится - это ни к чему
-    printf("data: %#.10x +%#.5x %s\n", data_block[i].pos, data_block[i].compsize, data_block[i].compressor);
+    // printf("data: %#.10x +%#.5x %s\n", data_block[i].pos, data_block[i].compsize, data_block[i].compressor);
   }
 
   // Посчитаем общее кол-во файлов в этом каталоге и изменим num_of_files[block_num] так, чтобы этот массив можно было использовать для определения файлов, принадлежащих блоку данных block_num
