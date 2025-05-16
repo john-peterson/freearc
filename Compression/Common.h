@@ -628,9 +628,8 @@ extern jmp_buf jumper;
 void *MyAlloc(size_t size) throw();
 void MyFree(void *address) throw();
 extern bool AllocTopDown;
-#ifdef FREEARC_WIN
 enum LPType {DEFAULT, FORCE, DISABLE, TRY};
-extern LPType DefaultLargePageMode;
+#ifdef FREEARC_WIN
 void *MidAlloc(size_t size) throw();
 void MidFree(void *address) throw();
 void *BigAlloc (int64 size, LPType LargePageMode=DEFAULT) throw();
@@ -639,6 +638,7 @@ void BigFree(void *address) throw();
 #define MidAlloc(size) MyAlloc(size)
 #define MidFree(address) MyFree(address)
 #define BigAlloc(size) MyAlloc(size)
+#define BigAlloc2(size, null) MyAlloc(size)
 #define BigFree(address) MyFree(address)
 #endif // !FREEARC_WIN
 

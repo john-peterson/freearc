@@ -1,5 +1,6 @@
 // Full sources required to compile srep.cpp are available at http://freearc.org/Download-Alpha.aspx
 // All rights reserved. Mail me if you have any questions or want to buy a commercial license for the source code.
+
 char *program_version     = "SREP 3.93 beta", *program_date = "August 3, 2013";
 char *program_description = "huge-dictionary LZ77 preprocessor   (c) Bulat.Ziganshin@gmail.com";
 char *program_homepage    = "http://freearc.org/research/SREP.aspx";
@@ -598,7 +599,8 @@ struct SliceHash
   void alloc (LPType LargePageMode)
   {
     if (memreq == 0)   {errcode = NO_ERRORS; return;}
-    h        =  (entry*) BigAlloc (memreq, LargePageMode);
+    // h        =  (entry*) BigAlloc (memreq, LargePageMode);
+    h        =  (entry*) BigAlloc (memreq);
     errcode  =  (h==NULL? ERROR_MEMORY : NO_ERRORS);
   }
   ~SliceHash()      {BigFree(h);}
@@ -698,12 +700,12 @@ struct HashTable
     bitshift = sizeof(HashValue)*CHAR_BIT - lb(bitarrsize);    // bitarrsize should be >=2, otherwise hash>>bitshift == hash>>64 == hash>>0 and indexing panics
 
     // Allocate arrays starting with the most frequently accessed (to increase their chances to become allocated using large pages)
-                                     bitarr    = (BYTE*)            BigAlloc (bitarrsize                            , LargePageMode);    if (!bitarr && bitarrsize!=0) return;
-                                     chunkarr  = (Chunk*)           BigAlloc (hashsize     * sizeof(Chunk)          , LargePageMode);    if (!chunkarr)  return;
-    if (!CONTENT_DEFINED_CHUNKING)  {hasharr   = (StoredHashValue*) BigAlloc (total_chunks * sizeof(StoredHashValue), LargePageMode);    if (!hasharr)   return;}
+                                     bitarr    = (BYTE*)            BigAlloc2 (bitarrsize                            , LargePageMode);    if (!bitarr && bitarrsize!=0) return;
+                                     chunkarr  = (Chunk*)           BigAlloc2 (hashsize     * sizeof(Chunk)          , LargePageMode);    if (!chunkarr)  return;
+    if (!CONTENT_DEFINED_CHUNKING)  {hasharr   = (StoredHashValue*) BigAlloc2 (total_chunks * sizeof(StoredHashValue), LargePageMode);    if (!hasharr)   return;}
                                      slicehash.alloc(LargePageMode);
-    if (CONTENT_DEFINED_CHUNKING)   {startarr  = (Offset*)          BigAlloc (total_chunks * sizeof(Offset)         , LargePageMode);    if (!startarr)  return;}
-    if (COMPARE_DIGESTS)            {digestarr = (Digest*)          BigAlloc (total_chunks * sizeof(Digest)         , LargePageMode);    if (!digestarr) return;}
+    if (CONTENT_DEFINED_CHUNKING)   {startarr  = (Offset*)          BigAlloc2 (total_chunks * sizeof(Offset)         , LargePageMode);    if (!startarr)  return;}
+    if (COMPARE_DIGESTS)            {digestarr = (Digest*)          BigAlloc2 (total_chunks * sizeof(Digest)         , LargePageMode);    if (!digestarr) return;}
 
     my_memset (bitarr,   0, bitarrsize);
     my_memset (chunkarr, 0, hashsize*sizeof(*chunkarr));   if (NOT_FOUND!=0)  {fprintf(stderr, "\nHashTable::HashTable() error: NOT_FOUND!=0\n");  abort();}
@@ -1438,7 +1440,7 @@ struct BG_COMPRESSION_THREAD : BackgroundThread
   static const int BUFFERS = 2;
   unsigned k;
   char *dict;
-  index*hashtable[BUFFERS];    // Place for saving info about maximum hashes and their indexes
+  index_t*hashtable[BUFFERS];    // Place for saving info about maximum hashes and their indexes
   char *bufptr[BUFFERS];
   char *buf[BUFFERS];
   STAT *statbuf[BUFFERS];
@@ -1466,10 +1468,10 @@ struct BG_COMPRESSION_THREAD : BackgroundThread
     : errcode(NO_ERRORS), k(0), ROUND_MATCHES(_ROUND_MATCHES), COMPARE_DIGESTS(_COMPARE_DIGESTS), BASE_LEN(_BASE_LEN), no_writes(_no_writes), hash_func(_hash_func), hash_obj(_hash_obj), filesize(_filesize), bufsize(_bufsize), header_size(_header_size), h (_h), inmem(_inmem), infile(_infile), fin(_fin), fout(_fout), fstat(_fstat)
   {
     dictsize = roundUp (mymax(_dictsize,BUFFERS*bufsize), bufsize);   // Dictionary size should be divisible by bufsize and BUFFERS*bufsize at least
-    dict = (char*) BigAlloc (dictsize, LargePageMode);
+    dict = (char*) BigAlloc2 (dictsize, LargePageMode);
     for (int i=0; i<BUFFERS; i++)
     {
-      hashtable[i] = (index*) malloc(sizeof(index) * bufsize/inmem.L*2);                    // For every L bytes in the buffer, we need 2 hash table elements
+      hashtable[i] = (index_t*) malloc(sizeof(index_t) * bufsize/inmem.L*2);                    // For every L bytes in the buffer, we need 2 hash table elements
       statbuf  [i] = (STAT *) malloc(sizeof(STAT ) * (MAX_STATS_PER_BLOCK(bufsize,BASE_LEN)+10));
       header   [i] = (STAT *) calloc(header_size,1);
       if (!dict || !hashtable[i] || !statbuf[i] || !header[i])
@@ -1477,7 +1479,7 @@ struct BG_COMPRESSION_THREAD : BackgroundThread
     }
   }
 
-  Offset memreq()  {return dictsize + BUFFERS*(sizeof(index)*bufsize/inmem.L*2 + sizeof(STAT)*MAX_STATS_PER_BLOCK(bufsize,BASE_LEN) + header_size);}
+  Offset memreq()  {return dictsize + BUFFERS*(sizeof(index_t)*bufsize/inmem.L*2 + sizeof(STAT)*MAX_STATS_PER_BLOCK(bufsize,BASE_LEN) + header_size);}
 
   void wait()
   {
@@ -1491,7 +1493,7 @@ struct BG_COMPRESSION_THREAD : BackgroundThread
     BigFree(dict);
   }
 
-  int read (char **_buf, STAT **_statbuf, STAT **_header, index **_hashtable)
+  int read (char **_buf, STAT **_statbuf, STAT **_header, index_t **_hashtable)
   {
     ReadDone.Wait();
     k = (k+1)%BUFFERS;
@@ -1514,7 +1516,7 @@ struct BG_COMPRESSION_THREAD : BackgroundThread
 private:   // Background thread code
   void run()
   {
-    Offset pos = 0;  index buf_offset = 0;
+    Offset pos = 0;  index_t buf_offset = 0;
     for(int i=1, first_block=1;  ;  buf_offset=(buf_offset+bufsize)%dictsize, i=(i+1)%BUFFERS, first_block=0)    // i = 1 0 1 0 1...  first_block = 1 0 0 0...
     {
       // 1. Read input data
@@ -1990,7 +1992,7 @@ int main (int argc, char **argv)
       for(;;)
       {
         // Read next input block (saving its copy to tempfile)
-        char *buf;  STAT *statbuf, *stat, *header;  index *hashptr;  unsigned literal_bytes;
+        char *buf;  STAT *statbuf, *stat, *header;  index_t *hashptr;  unsigned literal_bytes;
         int len = bg_thread.read (&buf, &statbuf, &header, &hashptr);   // Read data from file
         if (bg_thread.errcode)  {errcode = bg_thread.errcode; goto cleanup;}
         if (len==0)  goto print_stats;
@@ -2385,8 +2387,8 @@ print_stats:
       if (cmdmode==INFORMATION)
       {
         // We scan through the compressed file only in order to compute the uncompressed file size
-        file_seek_cur (fstat, statsize1);
-        file_seek_cur (fin, compsize1-statsize1);
+        file_seek (fstat, statsize1);
+        file_seek (fin, compsize1-statsize1);
         compsize += header_size + compsize1;
         origsize += origsize1;
         goto print_decompression_stats;
