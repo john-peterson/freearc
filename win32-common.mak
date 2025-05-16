@@ -1,5 +1,5 @@
 DEFINES  = -DFREEARC_WIN -DFREEARC_INTEL_BYTE_ORDER -DWIN32 -D_WINDOWS -D_UNICODE -DUNICODE
-TEMPDIR  = c:/temp/out/FreeArc
+TEMPDIR  = obj
 GHCDIR   = C:\Base\Compiler\ghc
 
 #For ghc 6.10.3

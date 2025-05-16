@@ -1,15 +1,15 @@
 DEFINES  = -DFREEARC_WIN -DFREEARC_INTEL_BYTE_ORDER -D_WIN32 -D_WINDOWS -D_UNICODE -DUNICODE
-TEMPDIR  = /tmp/out/FreeArc
+TEMPDIR  = obj
 GHCDIR   = /usr/lib/ghc
 MGW      = /usr/i686-w64-mingw32
 
 #For ghc 6.10.3
 LIBDIR   = -B$(GHCDIR)/lib -B$(MGW)/lib
-INCDIR   = -I$(GHCDIR)/include -I$(MGW)/include
-GCC_EXE  = /usr/bin/i686-w64-mingw32-g++
+INCDIR   = -I$(GHCDIR)/include -I$(MGW)/include -I/c/tools/ghc-9.8.2/include
+GCC_EXE  = i686-w64-mingw32-g++
 GCC      = $(GCC_EXE) $(LIBDIR) $(INCDIR) -march=i486 -mtune=pentiumpro
-DLLWRAP  = /usr/bin/i686-w64-mingw32-dllwrap $(LIBDIR)
-WINDRES  = /usr/bin/i686-w64-mingw32-windres
+DLLWRAP  = i686-w64-mingw32-dllwrap $(LIBDIR)
+WINDRES  = i686-w64-mingw32-windres
 
 #For ghc 6.12.3
 #LIBDIR   = $(GHCDIR)\gcc-lib
